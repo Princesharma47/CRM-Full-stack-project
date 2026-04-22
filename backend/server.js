@@ -13,6 +13,10 @@ const path = require('path');
 
 dotenv.config();
 
+// Support both MONGO_URI and MONGO_URL env var names
+const MONGO_URI = process.env.MONGO_URI || process.env.MONGO_URL;
+console.log('MONGO_URI defined:', !!MONGO_URI);
+
 const app = express();
 
 // Middleware
@@ -41,7 +45,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Database Connection
 mongoose
-  .connect(process.env.MONGO_URI)
+  .connect(MONGO_URI)
   .then(() => console.log('MongoDB Connected'))
   .catch((err) => console.log('MongoDB connection error: ', err));
 
