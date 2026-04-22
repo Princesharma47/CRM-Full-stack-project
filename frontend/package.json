@@ -3,13 +3,14 @@
   "version": "1.0.0",
   "private": true,
   "dependencies": {
-    "axios": "^1.6.8",
+    "@hello-pangea/dnd": "^18.0.1",
+    "axios": "^1.15.2",
     "gsap": "^3.15.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-router-dom": "^6.23.0",
+    "react-router-dom": "^6.30.3",
     "react-scripts": "5.0.1",
-    "recharts": "^2.12.7"
+    "recharts": "^2.15.4"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.19",

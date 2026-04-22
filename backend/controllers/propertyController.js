@@ -1,138 +1,179 @@
 const Property = require('../models/Property');
+const fs   = require('fs');
+const path = require('path');
 
-// @desc    Get all properties (with optional filters)
-// @route   GET /api/properties
-// @access  Public
+// ── Get All Properties ────────────────────────────────────────────────────────
+// @route   GET /api/properties?status=&type=&search=
 const getProperties = async (req, res) => {
   try {
-    const { type, minPrice, maxPrice, location } = req.query;
+    const { status, type, search, minPrice, maxPrice, location } = req.query;
+    let filter = {};
 
-    let query = {};
-    
-    if (type) query.type = type;
-    if (location) query.location = { $regex: location, $options: 'i' };
-    
+    if (status) filter.status = status;
+    if (type)   filter.type   = type;
+    if (location) filter.location = { $regex: location, $options: 'i' };
     if (minPrice || maxPrice) {
-      query.price = {};
-      if (minPrice) query.price.$gte = Number(minPrice);
-      if (maxPrice) query.price.$lte = Number(maxPrice);
+      filter.price = {};
+      if (minPrice) filter.price.$gte = Number(minPrice);
+      if (maxPrice) filter.price.$lte = Number(maxPrice);
+    }
+    if (search) {
+      filter.$or = [
+        { title:    { $regex: search, $options: 'i' } },
+        { location: { $regex: search, $options: 'i' } },
+      ];
     }
 
-    const properties = await Property.find(query).populate('addedBy', 'name email');
-    res.json(properties);
+    const properties = await Property.find(filter).sort({ createdAt: -1 });
+    res.json({ success: true, data: properties });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
-// @desc    Get single property
+// ── Get Single Property ───────────────────────────────────────────────────────
 // @route   GET /api/properties/:id
-// @access  Public
-const getPropertyById = async (req, res) => {
+const getProperty = async (req, res) => {
   try {
-    const property = await Property.findById(req.params.id).populate('addedBy', 'name email');
-    if (property) {
-      res.json(property);
-    } else {
-      res.status(404).json({ message: 'Property not found' });
-    }
+    const property = await Property.findById(req.params.id);
+    if (!property)
+      return res.status(404).json({ success: false, message: 'Property not found' });
+    res.json({ success: true, data: property });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
-// @desc    Create a property
-// @route   POST /api/properties
-// @access  Private
+// ── Create Property ───────────────────────────────────────────────────────────
+// @route   POST /api/properties  (multipart/form-data)
 const createProperty = async (req, res) => {
   try {
-    const { title, price, location, type, status } = req.body;
+    const { title, location, price, size, type, status, amenities, description } = req.body;
 
-    let imagePaths = [];
-    if (req.files && req.files.length > 0) {
-      imagePaths = req.files.map((file) => `/uploads/${file.filename}`);
+    if (!title || !location || !price) {
+      return res.status(400).json({
+        success: false,
+        message: 'Title, location and price are required',
+      });
     }
 
-    const property = new Property({
+    // Handle uploaded image filenames
+    const images = req.files ? req.files.map((f) => f.filename) : [];
+
+    // Amenities sent as comma-separated string from FormData
+    const amenitiesArr = amenities
+      ? amenities.split(',').map((a) => a.trim()).filter(Boolean)
+      : [];
+
+    const property = await Property.create({
       title,
-      price,
       location,
+      price,
+      size,
       type,
-      status: status || 'Available',
-      images: imagePaths,
-      addedBy: req.user._id,
+      status,
+      description,
+      amenities: amenitiesArr,
+      images,
+      addedBy:       req.user._id,  // backward compat
+      assignedAgent: req.user._id,
     });
 
-    const createdProperty = await property.save();
-    res.status(201).json(createdProperty);
+    res.status(201).json({ success: true, data: property });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
-// @desc    Update a property
-// @route   PUT /api/properties/:id
-// @access  Private
+// ── Update Property ───────────────────────────────────────────────────────────
+// @route   PUT /api/properties/:id  (multipart/form-data)
 const updateProperty = async (req, res) => {
   try {
-    const { title, price, location, type, status } = req.body;
-
     const property = await Property.findById(req.params.id);
+    if (!property)
+      return res.status(404).json({ success: false, message: 'Property not found' });
 
-    if (!property) {
-      return res.status(404).json({ message: 'Property not found' });
-    }
+    const { title, location, price, size, type, status, amenities, description } = req.body;
 
-    if (req.user.role !== 'Admin' && property.addedBy.toString() !== req.user._id.toString()) {
-      return res.status(403).json({ message: 'Not authorized to update this property' });
-    }
+    // New uploaded images appended to existing ones
+    const newImages = req.files ? req.files.map((f) => f.filename) : [];
 
-    let imagePaths = property.images;
-    if (req.files && req.files.length > 0) {
-      const newImages = req.files.map((file) => `/uploads/${file.filename}`);
-      imagePaths = [...imagePaths, ...newImages]; // append new images
-    }
+    const amenitiesArr = amenities
+      ? amenities.split(',').map((a) => a.trim()).filter(Boolean)
+      : property.amenities;
 
-    property.title = title || property.title;
-    property.price = price || property.price;
-    property.location = location || property.location;
-    property.type = type || property.type;
-    property.status = status || property.status;
-    property.images = imagePaths;
+    const updated = await Property.findByIdAndUpdate(
+      req.params.id,
+      {
+        title:    title    || property.title,
+        location: location || property.location,
+        price:    price    || property.price,
+        size:     size     !== undefined ? size : property.size,
+        type:     type     || property.type,
+        status:   status   || property.status,
+        description: description !== undefined ? description : property.description,
+        amenities: amenitiesArr,
+        images: [...property.images, ...newImages],
+      },
+      { new: true, runValidators: true }
+    );
 
-    const updatedProperty = await property.save();
-    res.json(updatedProperty);
+    res.json({ success: true, data: updated });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
-// @desc    Delete a property
+// ── Delete Property ────────────────────────────────────────────────────────────
 // @route   DELETE /api/properties/:id
-// @access  Private
 const deleteProperty = async (req, res) => {
   try {
     const property = await Property.findById(req.params.id);
+    if (!property)
+      return res.status(404).json({ success: false, message: 'Property not found' });
 
-    if (!property) {
-      return res.status(404).json({ message: 'Property not found' });
-    }
-
-    if (req.user.role !== 'Admin' && property.addedBy.toString() !== req.user._id.toString()) {
-      return res.status(403).json({ message: 'Not authorized to delete this property' });
-    }
+    // Delete all image files from disk
+    property.images.forEach((img) => {
+      const filePath = path.join(__dirname, '../uploads', img);
+      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+    });
 
     await property.deleteOne();
-    res.json({ message: 'Property removed' });
+    res.json({ success: true, message: 'Property deleted successfully' });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// ── Delete Single Image from a Property ───────────────────────────────────────
+// @route   DELETE /api/properties/:id/image/:filename
+const deleteImage = async (req, res) => {
+  try {
+    const { id, filename } = req.params;
+    const property = await Property.findById(id);
+    if (!property)
+      return res.status(404).json({ success: false, message: 'Property not found' });
+
+    // Remove file from disk
+    const filePath = path.join(__dirname, '../uploads', filename);
+    if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+
+    // Remove filename from DB array
+    property.images = property.images.filter((img) => img !== filename);
+    await property.save();
+
+    res.json({ success: true, data: property });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
 module.exports = {
   getProperties,
-  getPropertyById,
+  getProperty,
+  getPropertyById: getProperty, // alias for backward compat
   createProperty,
   updateProperty,
   deleteProperty,
+  deleteImage,
 };

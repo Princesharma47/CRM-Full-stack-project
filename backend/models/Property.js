@@ -6,36 +6,48 @@ const propertySchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    price: {
-      type: Number,
-      required: true,
-    },
     location: {
       type: String,
       required: true,
     },
-    type: {
-      type: String,
-      enum: ['Apartment', 'House', 'Commercial', 'Land'],
+    price: {
+      type: Number,
       required: true,
     },
-    images: {
-      type: [String], // Array of image paths/urls
-      default: [],
+    size: {
+      type: String,
+    },
+    type: {
+      type: String,
+      enum: ['Residential', 'Commercial', 'Plot', 'Villa', 'Apartment', 'House', 'Land'],
+      required: true,
     },
     status: {
       type: String,
-      enum: ['Available', 'Sold', 'Pending'],
+      enum: ['Available', 'Sold', 'Pending', 'Reserved'],
       default: 'Available',
     },
+    amenities: [String],
+    description: {
+      type: String,
+      default: '',
+    },
+    images: {
+      type: [String],
+      default: [],
+    },
+    // addedBy keeps backward compat with propertyController.js
     addedBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
-      required: true,
+    },
+    // assignedAgent used by newer code
+    assignedAgent: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
     },
   },
   { timestamps: true }
 );
 
-const Property = mongoose.model('Property', propertySchema);
-module.exports = Property;
+module.exports = mongoose.model('Property', propertySchema);

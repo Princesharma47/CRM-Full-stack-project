@@ -1,19 +1,20 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import PrivateRoute from './components/PrivateRoute';
-import Navbar from './components/Navbar';
+import Sidebar from './components/Sidebar';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Leads from './pages/Leads';
 import Properties from './pages/Properties';
 import Deals from './pages/Deals';
+import LifeAtAgnayi from './pages/LifeAtAgnayi';
 
-const Layout = ({ children }) => (
-  <>
-    <Navbar />
-    <main className="p-6 bg-gray-50 min-h-screen">{children}</main>
-  </>
+// Wraps protected pages in the sidebar shell
+const AppLayout = ({ children }) => (
+  <PrivateRoute>
+    <Sidebar>{children}</Sidebar>
+  </PrivateRoute>
 );
 
 function App() {
@@ -21,21 +22,19 @@ function App() {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
+          {/* Public routes */}
           <Route path="/login"    element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/dashboard" element={
-            <PrivateRoute><Layout><Dashboard /></Layout></PrivateRoute>
-          }/>
-          <Route path="/leads" element={
-            <PrivateRoute><Layout><Leads /></Layout></PrivateRoute>
-          }/>
-          <Route path="/properties" element={
-            <PrivateRoute><Layout><Properties /></Layout></PrivateRoute>
-          }/>
-          <Route path="/deals" element={
-            <PrivateRoute><Layout><Deals /></Layout></PrivateRoute>
-          }/>
-          <Route path="*" element={<Navigate to="/dashboard" />} />
+
+          {/* Protected routes — all share the Sidebar layout */}
+          <Route path="/dashboard"  element={<AppLayout><Dashboard  /></AppLayout>} />
+          <Route path="/leads"      element={<AppLayout><Leads      /></AppLayout>} />
+          <Route path="/properties" element={<AppLayout><Properties /></AppLayout>} />
+          <Route path="/deals"      element={<AppLayout><Deals      /></AppLayout>} />
+          <Route path="/life-at-agnayi" element={<AppLayout><LifeAtAgnayi /></AppLayout>} />
+
+          {/* Catch-all → dashboard */}
+          <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
