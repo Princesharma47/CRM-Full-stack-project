@@ -22,13 +22,6 @@ const EMPTY_FORM = {
 };
 
 // ─── Sub-components ──────────────────────────────────────────────────────────
-const StatusBadge = ({ status }) => (
-  <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${STATUS_COLORS[status] || 'bg-gray-100 text-gray-600'}`}>
-    <span className="w-1.5 h-1.5 rounded-full bg-current opacity-60" />
-    {status}
-  </span>
-);
-
 const InputField = ({ label, required, children }) => (
   <div>
     <label className="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1.5">

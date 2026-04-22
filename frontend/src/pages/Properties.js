@@ -203,7 +203,8 @@ const Properties = () => {
       }
     }, containerRef);
     return () => ctx.revert();
-  }, [loading]); // only re-run when loading state changes, not on every filter
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading]);
 
   // ── Modal helpers ──────────────────────────────────────────────────────────
   const openAdd = () => {
