@@ -3,6 +3,8 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
 
+const runSeed = require('./seed');
+
 // Routes imports
 const authRoutes = require('./routes/authRoutes');
 const leadRoutes = require('./routes/leadRoutes');
@@ -46,7 +48,10 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // Database Connection
 mongoose
   .connect(MONGO_URI)
-  .then(() => console.log('MongoDB Connected'))
+  .then(async () => {
+    console.log('MongoDB Connected');
+    await runSeed(); // seed demo data if collections are empty
+  })
   .catch((err) => console.log('MongoDB connection error: ', err));
 
 // Start server
