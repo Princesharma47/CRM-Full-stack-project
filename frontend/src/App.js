@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
 import PrivateRoute from './components/PrivateRoute';
 import Sidebar from './components/Sidebar';
 import Login from './pages/Login';
@@ -19,25 +20,27 @@ const AppLayout = ({ children }) => (
 
 function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <Routes>
-          {/* Public routes */}
-          <Route path="/login"    element={<Login />} />
-          <Route path="/register" element={<Register />} />
+    <ThemeProvider>
+      <AuthProvider>
+        <BrowserRouter>
+          <Routes>
+            {/* Public routes */}
+            <Route path="/login"    element={<Login />} />
+            <Route path="/register" element={<Register />} />
 
-          {/* Protected routes — all share the Sidebar layout */}
-          <Route path="/dashboard"  element={<AppLayout><Dashboard  /></AppLayout>} />
-          <Route path="/leads"      element={<AppLayout><Leads      /></AppLayout>} />
-          <Route path="/properties" element={<AppLayout><Properties /></AppLayout>} />
-          <Route path="/deals"      element={<AppLayout><Deals      /></AppLayout>} />
-          <Route path="/life-at-agnayi" element={<AppLayout><LifeAtAgnayi /></AppLayout>} />
+            {/* Protected routes — all share the Sidebar layout */}
+            <Route path="/dashboard"  element={<AppLayout><Dashboard  /></AppLayout>} />
+            <Route path="/leads"      element={<AppLayout><Leads      /></AppLayout>} />
+            <Route path="/properties" element={<AppLayout><Properties /></AppLayout>} />
+            <Route path="/deals"      element={<AppLayout><Deals      /></AppLayout>} />
+            <Route path="/life-at-agnayi" element={<AppLayout><LifeAtAgnayi /></AppLayout>} />
 
-          {/* Catch-all → dashboard */}
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
-        </Routes>
-      </BrowserRouter>
-    </AuthProvider>
+            {/* Catch-all → dashboard */}
+            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 

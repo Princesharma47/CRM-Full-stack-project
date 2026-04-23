@@ -47,3 +47,82 @@ aside { transition: width 0.25s ease; }
 [data-rbd-drag-handle-context-id]:active {
   cursor: grabbing;
 }
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   DARK MODE OVERRIDES
+   Applied when <html class="dark"> is set by ThemeContext
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+/* Page background */
+.dark body { background-color: #0f172a; }
+
+/* ── Surfaces (white cards, sidebars, headers) ─────────────────────────────── */
+.dark .bg-white          { background-color: #1e293b !important; }
+.dark .bg-gray-50        { background-color: #0f172a !important; }
+.dark .bg-gray-50\/80    { background-color: rgba(15,23,42,0.8) !important; }
+.dark .bg-gray-50\/50    { background-color: rgba(15,23,42,0.5) !important; }
+
+/* ── Borders ───────────────────────────────────────────────────────────────── */
+.dark .border-gray-100   { border-color: #334155 !important; }
+.dark .border-gray-200   { border-color: #334155 !important; }
+
+/* ── Text ──────────────────────────────────────────────────────────────────── */
+.dark .text-gray-900     { color: #f1f5f9 !important; }
+.dark .text-gray-800     { color: #e2e8f0 !important; }
+.dark .text-gray-700     { color: #cbd5e1 !important; }
+.dark .text-gray-600     { color: #94a3b8 !important; }
+.dark .text-gray-500     { color: #64748b !important; }
+.dark .text-gray-400     { color: #475569 !important; }
+.dark .text-gray-300     { color: #334155 !important; }
+
+/* ── Inputs & selects ──────────────────────────────────────────────────────── */
+.dark input,
+.dark select,
+.dark textarea {
+  background-color: #0f172a !important;
+  border-color: #334155 !important;
+  color: #e2e8f0 !important;
+}
+.dark input::placeholder,
+.dark textarea::placeholder { color: #475569 !important; }
+.dark input:focus,
+.dark select:focus,
+.dark textarea:focus {
+  background-color: #1e293b !important;
+}
+
+/* ── Table rows ────────────────────────────────────────────────────────────── */
+.dark tbody.divide-y > tr { border-color: #1e293b !important; }
+.dark tr.lead-row:hover,
+.dark tr:hover { background-color: rgba(51,65,85,0.4) !important; }
+
+/* ── Hover states ──────────────────────────────────────────────────────────── */
+.dark .hover\:bg-gray-50:hover  { background-color: #334155 !important; }
+.dark .hover\:bg-gray-100:hover { background-color: #334155 !important; }
+
+/* ── Sidebar nav items ─────────────────────────────────────────────────────── */
+.dark .text-gray-500.hover\:bg-gray-100:hover { background-color: #334155 !important; }
+
+/* ── Modals ────────────────────────────────────────────────────────────────── */
+.dark .bg-white.rounded-3xl { background-color: #1e293b !important; }
+.dark .border-gray-100.mt-6 { border-color: #334155 !important; }
+
+/* ── Kanban cards ──────────────────────────────────────────────────────────── */
+.dark .deal-card {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+}
+.dark .deal-card .border-t { border-color: #334155 !important; }
+
+/* ── Kanban column body ────────────────────────────────────────────────────── */
+.dark .bg-gray-50\/50.rounded-3xl { background-color: rgba(30,41,59,0.5) !important; }
+
+/* ── Scrollbar in dark ─────────────────────────────────────────────────────── */
+.dark ::-webkit-scrollbar-thumb { background: #334155; }
+.dark ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+/* ── Source badge in leads table ───────────────────────────────────────────── */
+.dark .bg-gray-100 { background-color: #334155 !important; }
+
+/* ── Cancel button in modals ───────────────────────────────────────────────── */
+.dark .bg-white.border.border-gray-200 { background-color: #0f172a !important; }
