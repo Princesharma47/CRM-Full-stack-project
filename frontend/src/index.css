@@ -10,19 +10,53 @@
 }
 
 html {
-  font-size: 14px; /* Compact mode — shrinks Tailwind elements by ~12.5% */
+  font-size: 14px;
+}
+
+/* ── CSS Variables — Light (default) ──────────────────────────────────────── */
+:root {
+  --bg-page:      #f8fafc;
+  --bg-surface:   #ffffff;
+  --bg-muted:     #f8fafc;
+  --bg-input:     #f8fafc;
+  --border:       #e2e8f0;
+  --border-light: #f1f5f9;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted:   #94a3b8;
+  --text-faint:   #cbd5e1;
+  --hover-bg:     #f1f5f9;
+  --scrollbar:    #cbd5e1;
+}
+
+/* ── CSS Variables — Dark ─────────────────────────────────────────────────── */
+html.dark {
+  --bg-page:      #0f172a;
+  --bg-surface:   #1e293b;
+  --bg-muted:     #0f172a;
+  --bg-input:     #0f172a;
+  --border:       #334155;
+  --border-light: #1e293b;
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-muted:   #64748b;
+  --text-faint:   #334155;
+  --hover-bg:     #334155;
+  --scrollbar:    #334155;
 }
 
 body {
-  background-color: #f8fafc;
+  background-color: var(--bg-page);
+  color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 /* ── Scrollbar ─────────────────────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+::-webkit-scrollbar-thumb { background: var(--scrollbar); border-radius: 10px; }
 ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
 /* ── Hide scrollbar for kanban columns ────────────────────────────────────── */
@@ -41,88 +75,79 @@ aside { transition: width 0.25s ease; }
 }
 
 /* ── Drag ghost ───────────────────────────────────────────────────────────── */
-[data-rbd-drag-handle-context-id] {
-  cursor: grab;
-}
-[data-rbd-drag-handle-context-id]:active {
-  cursor: grabbing;
-}
+[data-rbd-drag-handle-context-id] { cursor: grab; }
+[data-rbd-drag-handle-context-id]:active { cursor: grabbing; }
 
 /* ══════════════════════════════════════════════════════════════════════════════
-   DARK MODE OVERRIDES
-   Applied when <html class="dark"> is set by ThemeContext
+   DARK MODE — override Tailwind utility classes
+   These rules only activate when <html class="dark"> is present
    ══════════════════════════════════════════════════════════════════════════════ */
 
-/* Page background */
-.dark body { background-color: #0f172a; }
+/* Surfaces */
+html.dark .bg-white,
+html.dark .bg-white\/80 { background-color: var(--bg-surface) !important; }
 
-/* ── Surfaces (white cards, sidebars, headers) ─────────────────────────────── */
-.dark .bg-white          { background-color: #1e293b !important; }
-.dark .bg-gray-50        { background-color: #0f172a !important; }
-.dark .bg-gray-50\/80    { background-color: rgba(15,23,42,0.8) !important; }
-.dark .bg-gray-50\/50    { background-color: rgba(15,23,42,0.5) !important; }
+html.dark .bg-gray-50,
+html.dark .bg-gray-50\/80,
+html.dark .bg-gray-50\/50 { background-color: var(--bg-muted) !important; }
 
-/* ── Borders ───────────────────────────────────────────────────────────────── */
-.dark .border-gray-100   { border-color: #334155 !important; }
-.dark .border-gray-200   { border-color: #334155 !important; }
+html.dark .bg-gray-100 { background-color: #334155 !important; }
 
-/* ── Text ──────────────────────────────────────────────────────────────────── */
-.dark .text-gray-900     { color: #f1f5f9 !important; }
-.dark .text-gray-800     { color: #e2e8f0 !important; }
-.dark .text-gray-700     { color: #cbd5e1 !important; }
-.dark .text-gray-600     { color: #94a3b8 !important; }
-.dark .text-gray-500     { color: #64748b !important; }
-.dark .text-gray-400     { color: #475569 !important; }
-.dark .text-gray-300     { color: #334155 !important; }
+/* Borders */
+html.dark .border-gray-100,
+html.dark .border-gray-200 { border-color: var(--border) !important; }
 
-/* ── Inputs & selects ──────────────────────────────────────────────────────── */
-.dark input,
-.dark select,
-.dark textarea {
-  background-color: #0f172a !important;
-  border-color: #334155 !important;
+html.dark .divide-gray-50 > * + * { border-color: var(--border-light) !important; }
+
+/* Text */
+html.dark .text-gray-900 { color: #f1f5f9 !important; }
+html.dark .text-gray-800 { color: #e2e8f0 !important; }
+html.dark .text-gray-700 { color: #cbd5e1 !important; }
+html.dark .text-gray-600 { color: #94a3b8 !important; }
+html.dark .text-gray-500 { color: #64748b !important; }
+html.dark .text-gray-400 { color: #475569 !important; }
+html.dark .text-gray-300 { color: #334155 !important; }
+
+/* Inputs, selects, textareas */
+html.dark input:not([type="checkbox"]):not([type="radio"]),
+html.dark select,
+html.dark textarea {
+  background-color: var(--bg-input) !important;
+  border-color: var(--border) !important;
   color: #e2e8f0 !important;
 }
-.dark input::placeholder,
-.dark textarea::placeholder { color: #475569 !important; }
-.dark input:focus,
-.dark select:focus,
-.dark textarea:focus {
-  background-color: #1e293b !important;
+html.dark input::placeholder,
+html.dark textarea::placeholder { color: #475569 !important; }
+html.dark input:focus,
+html.dark select:focus,
+html.dark textarea:focus { background-color: var(--bg-surface) !important; }
+
+/* Hover states */
+html.dark .hover\:bg-gray-50:hover,
+html.dark .hover\:bg-gray-100:hover { background-color: var(--hover-bg) !important; }
+
+/* Table */
+html.dark tbody tr:hover { background-color: rgba(51,65,85,0.4) !important; }
+html.dark thead { background-color: #1e293b !important; }
+
+/* Kanban deal cards */
+html.dark .deal-card {
+  background-color: var(--bg-surface) !important;
+  border-color: var(--border) !important;
+}
+html.dark .deal-card .border-t { border-color: var(--border) !important; }
+
+/* Modals */
+html.dark .fixed.inset-0 > div[class*="rounded-3xl"],
+html.dark .fixed.inset-0 > div[class*="rounded-2xl"] {
+  background-color: var(--bg-surface) !important;
 }
 
-/* ── Table rows ────────────────────────────────────────────────────────────── */
-.dark tbody.divide-y > tr { border-color: #1e293b !important; }
-.dark tr.lead-row:hover,
-.dark tr:hover { background-color: rgba(51,65,85,0.4) !important; }
+/* Stat cards on dashboard */
+html.dark .stat-card > div { background-color: var(--bg-surface) !important; }
+html.dark .stat-card .border-gray-100 { border-color: var(--border) !important; }
+html.dark .stat-card .bg-gray-50 { background-color: #334155 !important; }
 
-/* ── Hover states ──────────────────────────────────────────────────────────── */
-.dark .hover\:bg-gray-50:hover  { background-color: #334155 !important; }
-.dark .hover\:bg-gray-100:hover { background-color: #334155 !important; }
-
-/* ── Sidebar nav items ─────────────────────────────────────────────────────── */
-.dark .text-gray-500.hover\:bg-gray-100:hover { background-color: #334155 !important; }
-
-/* ── Modals ────────────────────────────────────────────────────────────────── */
-.dark .bg-white.rounded-3xl { background-color: #1e293b !important; }
-.dark .border-gray-100.mt-6 { border-color: #334155 !important; }
-
-/* ── Kanban cards ──────────────────────────────────────────────────────────── */
-.dark .deal-card {
-  background-color: #1e293b !important;
-  border-color: #334155 !important;
-}
-.dark .deal-card .border-t { border-color: #334155 !important; }
-
-/* ── Kanban column body ────────────────────────────────────────────────────── */
-.dark .bg-gray-50\/50.rounded-3xl { background-color: rgba(30,41,59,0.5) !important; }
-
-/* ── Scrollbar in dark ─────────────────────────────────────────────────────── */
-.dark ::-webkit-scrollbar-thumb { background: #334155; }
-.dark ::-webkit-scrollbar-thumb:hover { background: #475569; }
-
-/* ── Source badge in leads table ───────────────────────────────────────────── */
-.dark .bg-gray-100 { background-color: #334155 !important; }
-
-/* ── Cancel button in modals ───────────────────────────────────────────────── */
-.dark .bg-white.border.border-gray-200 { background-color: #0f172a !important; }
+/* Filter bar / table containers */
+html.dark .rounded-2xl.border,
+html.dark .rounded-3xl.border { background-color: var(--bg-surface) !important; }
